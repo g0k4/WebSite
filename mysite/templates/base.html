@@ -34,8 +34,12 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if user.is_authenticated %}
+              {{user}}
               <a class="nav-item nav-link" href="#">Edit Profile</a>
               <a class="nav-item nav-link" href="{% url 'news:create' %}">Create new</a>
+              <form action="">
+              <a class="nav-item nav-link" href="{% url 'profiles:logout' %}">logout</a>
+              </form>
               {% else %}
                 <a class="nav-item nav-link" href="#">Login</a>
                 <a class="nav-item nav-link" href="#">Register</a>
