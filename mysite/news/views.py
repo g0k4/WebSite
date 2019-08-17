@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from .models import News
+from comment.models import Comment
+from comment.forms import CreateComment
 from django.views.generic import (
     ListView,
     DetailView,
@@ -26,6 +28,27 @@ class NewsListView(ListView):
 
 class NewDetailView(DetailView):
     model = News
+
+
+def detail_view(request, pk):
+    new = News.objects.get(id=pk)
+    comments = Comment.objects.filter(new=new)
+
+    if request.method == 'POST' :
+        form = CreateComment(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.new = new
+            comment.author = request.user
+            comment.save()
+    else:
+        form = CreateComment()
+
+    return render(request, 'news/news_detail.html', {
+        'new':new,
+        'form':form,
+        'comments':comments
+    })
 
 
 class NewCreateView(LoginRequiredMixin, CreateView):
