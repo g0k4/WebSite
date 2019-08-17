@@ -16,7 +16,7 @@ from django.views.generic import (
 def about_view(request):
     return render(request,'news/about.html', {'title':'About'})
 
-
+#detail new view
 def detail_view(request, pk):
     new = News.objects.get(id=pk)
     comments = Comment.objects.filter(new=new)[::-1]
@@ -40,6 +40,7 @@ def detail_view(request, pk):
 
 
 # News's class based views
+# home page
 class NewsListView(ListView):
     model = News
     template_name = 'news/home.html'

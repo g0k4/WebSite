@@ -27,7 +27,7 @@ def login_view(request):
             login(request, user)
             if 'next' in request.GET:
                 return redirect(request.GET.get('next'))
-            return redirect('profiles:register')
+            return redirect('news:home')
     else:
         form = AuthenticationForm()
 
@@ -35,9 +35,8 @@ def login_view(request):
 
 
 def logout_view(request):
-    if request.method == 'POST':
-        logout(request)
-        return HttpResponse('logouted')
+    logout(request)
+    return redirect('profiles:login')
 
 @login_required()
 def update_view(request):
