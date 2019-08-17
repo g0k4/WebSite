@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from .models import News
-from comment.models import Comment
-from comment.forms import CreateComment
+from .models import Comment
+from .forms import CreateComment
+from profiles.models import User
 from django.views.generic import (
     ListView,
     DetailView,
@@ -11,14 +12,34 @@ from django.views.generic import (
     DeleteView
 )
 
-# from .forms import CreateNew
-
-# Create your views here.
 
 def about_view(request):
     return render(request,'news/about.html', {'title':'About'})
 
 
+def detail_view(request, pk):
+    new = News.objects.get(id=pk)
+    comments = Comment.objects.filter(new=new)[::-1]
+
+    if request.method == 'POST' :
+        form = CreateComment(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.new = new
+            comment.author = request.user
+            comment.save()
+            return redirect('news:detail', pk=pk)
+    else:
+        form = CreateComment()
+
+    return render(request, 'news/news_detail.html', {
+        'new':new,
+        'form':form,
+        'comments':comments
+    })
+
+
+# News's class based views
 class NewsListView(ListView):
     model = News
     template_name = 'news/home.html'
@@ -28,27 +49,6 @@ class NewsListView(ListView):
 
 class NewDetailView(DetailView):
     model = News
-
-
-def detail_view(request, pk):
-    new = News.objects.get(id=pk)
-    comments = Comment.objects.filter(new=new)
-
-    if request.method == 'POST' :
-        form = CreateComment(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.new = new
-            comment.author = request.user
-            comment.save()
-    else:
-        form = CreateComment()
-
-    return render(request, 'news/news_detail.html', {
-        'new':new,
-        'form':form,
-        'comments':comments
-    })
 
 
 class NewCreateView(LoginRequiredMixin, CreateView):
@@ -64,7 +64,8 @@ class NewCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
- 
+
+
 class NewUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     model = News
     fields = ['title', 'thumb', 'content']
@@ -95,17 +96,53 @@ class NewDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         if user == new.author:
             return True
         return False
-"""
-def create_view(request):
-    if request.method == 'POST':
-        form = CreateNew(request.POST, request.FILES)
-        form.instance.author = request.user
-        if form.is_valid():
-            form.save()
-            return redirect('news:home')
+
+ 
+# comment's class based views
+
+class CommentUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
+    """
+        update comment
+    """
+    model = Comment
+    fields = ['content']
+    template_name = 'comment/comment_update.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        comment = self.get_object()
+        user = self.request.user
+        # add admin fro delete
+        if user == comment.author:
+            return True
+        return False
+
+
+def delete_comment_view(request, pk, comment):
+    comment = Comment.objects.get(id=comment)
+    if request.user == comment.author:
+        comment.delete()
+        return redirect('news:detail', pk=pk)
     else:
-        form = CreateNew()
-    return render(request, 'news/news_form.html', {
-        'form':form 
-    })
+        return redirect('news:home')
+
+
+# delete comment
+"""
+class CommentDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+    model = Comment
+    template_name = 'comment/comment_delete.html'
+    success_url = '/'
+
+    def test_func(self):
+        comment = self.get_object()
+        user = self.request.user
+        # add admin fro delete
+        if user == comment.author:
+            return True
+        return False
+
 """

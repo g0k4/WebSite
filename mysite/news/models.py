@@ -3,8 +3,6 @@ from profiles.models import User
 from django.utils import timezone
 from django.urls import reverse
 
-# Create your models here.
-
 
 class News(models.Model):
     title = models.CharField(max_length=100)
@@ -19,3 +17,17 @@ class News(models.Model):
 
     def get_absolute_url(self):
        return reverse('news:detail', kwargs={'pk': self.pk})
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    date_posted = models.DateTimeField(default=timezone.now)
+    new = models.ForeignKey(News, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.content
+
+
+    def get_absolute_url(self):
+       return reverse('news:detail', kwargs={'pk': self.new.pk})

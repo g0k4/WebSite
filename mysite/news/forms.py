@@ -2,14 +2,9 @@ from django import forms
 from . import models
 
 
-
-"""
-class CreateNew(forms.ModelForm):
+class CreateComment(forms.ModelForm):
     class Meta:
-        model = models.News
+        model = models.Comment
         fields = [
-            'title',
-            'thumb',
             'content'
         ]
-"""
