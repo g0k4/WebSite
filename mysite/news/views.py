@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
-from .models import News
-from .models import Comment
+from .models import News, Comment
 from .forms import CreateComment
+from django.urls import reverse
+from django.db.models import Q
 from profiles.models import User
 from django.views.generic import (
     ListView,
@@ -16,7 +17,14 @@ from django.views.generic import (
 def about_view(request):
     return render(request,'news/about.html', {'title':'About'})
 
-#detail new view
+
+def home_view(requset):
+    news = News.objects.all().filter(date_posted)
+    return render(request, 'news/home.html', {
+        'news':news,
+    })
+
+
 def detail_view(request, pk):
     new = News.objects.get(id=pk)
     comments = Comment.objects.filter(new=new)[::-1]
@@ -39,17 +47,33 @@ def detail_view(request, pk):
     })
 
 
-# News's class based views
-# home page
+def search_view(request):
+    search_query = request.GET.get('search','')
+    news = None
+    users = None
+
+    if search_query:
+        news = News.objects.filter(Q(title__icontains=search_query)| Q(content__icontains=search_query))
+        users = User.objects.filter(username__icontains=search_query)
+    
+    return render(request, 'news/search.html',{
+        'news':news,
+        'users':users,
+    })
+
+
+"""
+def ping_view(request):
+    host = request.GET.get('ping','')
+    if ping_query:
+"""
+
+
 class NewsListView(ListView):
     model = News
     template_name = 'news/home.html'
     context_object_name = 'news'
     ordering = ['-date_posted']
-
-
-class NewDetailView(DetailView):
-    model = News
 
 
 class NewCreateView(LoginRequiredMixin, CreateView):
@@ -66,21 +90,15 @@ class NewCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-
 class NewUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     model = News
     fields = ['title', 'thumb', 'content']
     template_name = 'news/news_update.html'
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
     def test_func(self):
         new = self.get_object()
         user = self.request.user
-        # add admin fro delete
-        if user == new.author:
+        if user == new.author or user.is_superuser:
             return True
         return False
 
@@ -93,31 +111,20 @@ class NewDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     def test_func(self):
         new = self.get_object()
         user = self.request.user
-        # add admin fro delete
-        if user == new.author:
+        if user == new.author or user.is_superuser:
             return True
         return False
 
- 
-# comment's class based views
 
 class CommentUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
-    """
-        update comment
-    """
     model = Comment
     fields = ['content']
     template_name = 'comment/comment_update.html'
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
     def test_func(self):
         comment = self.get_object()
         user = self.request.user
-        # add admin fro delete
-        if user == comment.author:
+        if user == comment.author or user.is_superuser:
             return True
         return False
 
@@ -131,7 +138,12 @@ def delete_comment_view(request, pk, comment):
         return redirect('news:home')
 
 
-# delete comment
+"""
+class NewDetailView(DetailView):
+    model = News
+"""
+
+
 """
 class CommentDeleteView(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     model = Comment

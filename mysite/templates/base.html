@@ -30,6 +30,7 @@
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{% url 'news:home' %}">Home</a>
               <a class="nav-item nav-link" href="{% url 'news:about' %}">About</a>
+              <a class="nav-item nav-link" href="{% url 'news:search' %}">Search</a>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -42,6 +43,7 @@
               {% else %}
                 <a class="nav-item nav-link" href="{% url 'profiles:login' %}">Login</a>
                 <a class="nav-item nav-link" href="{% url 'profiles:register' %}">Register</a>
+                <a href="nav-item nav-link" href="{% url 'news:search' %}"></a>
               {% endif %}
             </div>
           </div>
@@ -58,7 +60,7 @@
             <h3>Our Sidebar</h3>
             <p class='text-muted'>You can put any information here you'd like.
               <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Latest </li>
                 <li class="list-group-item list-group-item-light">Announcements</li>
                 <li class="list-group-item list-group-item-light">Calendars</li>
                 <li class="list-group-item list-group-item-light">etc</li>

@@ -14,10 +14,10 @@ urlpatterns = [
     path('<int:pk>/update/', views.NewUpdateView.as_view(), name='update'),
     path('<int:pk>/delete/', views.NewDeleteView.as_view(), name='delete'),
     
-
     # comments links
     path('comment/update/<int:pk>', views.CommentUpdateView.as_view(), name='comment_update'),
-    path('<int:pk>/delete_comment/<int:comment>', views.delete_comment_view, name='com_del'),
-    #path('comment/delete/<int:pk>', views.CommentDeleteView.as_view(), name='comment_delete'),
+    path('<int:pk>/delete_comment/<int:comment>', views.delete_comment_view, name='comment_delete'),
+    # path('comment/delete/<int:pk>', views.CommentDeleteView.as_view(), name='comment_delete'),
 
+    path('search/', views.search_view, name="search"),
 ]

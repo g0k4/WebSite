@@ -8,3 +8,4 @@ class CreateComment(forms.ModelForm):
         fields = [
             'content'
         ]
+
