@@ -131,7 +131,7 @@ class CommentUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
 
 def delete_comment_view(request, pk, comment):
     comment = Comment.objects.get(id=comment)
-    if request.user == comment.author:
+    if request.user == comment.author or request.user.is_superuser:
         comment.delete()
         return redirect('news:detail', pk=pk)
     else:

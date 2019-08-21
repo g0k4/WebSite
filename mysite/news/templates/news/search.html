@@ -9,10 +9,10 @@
             <button class="btn btn-outline-info" type="submit">Search</button>
         </fieldset>
     </form>
-    <legend class="border-bottom mb-4">Posts</legend>
+    <legend class="border-bottom mb-4">News</legend>
     {% for new in news %}
         <article class="media content-section">
-        <img src="{{ new.author.image.url }}" alt="" class="rounded-circle artcile-img">
+        <img src="{{ new.author.image.url }}" alt="" class="rounded-circle account-img">
           <div class="media-body">
             <div class="article-metadata">
               <a class="mr-2" href="#">{{ new.author }}</a>
@@ -26,7 +26,7 @@
     <legend class="border-bottom mb-4">Users</legend>
     {% for user in users %}
     <article class="media content-section">
-      <img src="{{ user.image.url }}" alt="" class="rounded-circle">
+      <img src="{{ user.image.url }}" alt="" class="rounded-circle account-img">
       <div class="media-body">
         <a class="mr-2" href="#">{{ user.username }}</a>
       </div>

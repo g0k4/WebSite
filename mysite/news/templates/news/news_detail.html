@@ -1,44 +1,69 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
 {% block content %}
     <article class="media content-section">
-        <img src="{{ new.author.image.url }}" alt="" class="rounded-circle artcile-img">
+        <img src="{{ new.author.image.url }}" alt="" class="rounded-circle account-img">
         <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ new.author }}</a>
-            <small class="text-muted">{{ new.date_posted }}</small>
-            {% if new.author == user or user.is_superuser %}
-            <div>
-                <a class="btn btn-secondary btn-sm mt-1 mb-1"href="{% url 'news:update' new.id %}">Update</a>
-                <a class="btn btn-danger btn-sm mt-1 mb-1"href="{% url 'news:delete' new.id %}">Delete</a>
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ new.author }}</a>
+                <small class="text-muted">{{ new.date_posted }}</small>
+                {% if new.author == user or user.is_superuser %}
+                <div>
+                    <a class="btn btn-secondary btn-sm mt-1 mb-1"href="{% url 'news:update' new.id %}">Update</a>
+                    <a class="btn btn-danger btn-sm mt-1 mb-1"href="{% url 'news:delete' new.id %}">Delete</a>
+                </div>
+                {% endif %}
+                <h2><a class="article-title" href="#">{{ new.title }}</a></h2>
+            <img src="{{ new.thumb.url }}" alt="" class="news-img">
+            <p class="article-content">{{ new.content }}</p>
+            
             </div>
-              {% endif %}
         </div>
-        <h2><a class="article-title" href="#">{{ new.title }}</a></h2>
-        <!-- картинка-->
-        <img src="{{ new.thumb.url }}" alt="" class="rounded-circle artcile-img">
-        <p class="article-content">{{ new.content }}</p>
-        <div class="article-metadata">
-            {% if user.is_authenticated %}
-            <form action="" method="POST">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <input type="submit" class="btn btn-primary" value="Commit">
-            </form>
-            {% endif %}
-        </div>
-        {% for comment in comments %}
-        <div>
-            {% if comment.author == user or user.is_superuser%}
-            <div>
-                <a class="btn btn-secondary btn-sm mt-1 mb-1"href="{% url 'news:comment_update' pk=comment.id %}">Update</a>
-                <a class="btn btn-danger btn-sm mt-1 mb-1"href="{% url 'news:comment_delete' pk=new.id comment=comment.id%}">Delete</a>
-            </div>
-            {% endif %}
-          <p>{{comment.author}}</p>
-          <p>{{comment.content}}</p>
-        </div>
-        {% endfor %}
-        </div>
-        
     </article>
+    {% if user.is_authenticated %}
+    <article class="chatContainer">
+        <div class="chatTitleContainer">Comments</div>
+        <div class="chatHistoryContainer">
+            <ul class="formComments">
+                {% for comment in comments %}
+                    <li class="commentLi commentstep-1">
+                        <table class="form-comments-table">
+                            <tr>
+                                <td><div class="comment-user">{{comment.author}}</div></td>
+                                <td>
+                                <div class="comment-avatar">
+                                    <img src="{{comment.author.image.url}}" class="rounded-circle"">
+                                </div>
+                                </td>
+                                {% if comment.author == user or user.is_superuser %}
+                                <td>
+                                    <div class="comment-edit">
+                                        <a class="btn btn-secondary btn-sm mt-1 mb-1"href="{% url 'news:comment_update' pk=comment.id %}">Update</a>
+                                        <a class="btn btn-danger btn-sm mt-1 mb-1"href="{% url 'news:comment_delete' pk=new.id comment=comment.id%}">Delete</a>
+                                    </div>
+                                </td>
+                                {% endif %}
+                                <td>
+                                <div id="comment-4" class="comment comment-step1" style="opacity: 1; background-color: rgb(255, 255, 255); border-left-width: 1px;">
+                                    <p>{{comment.content}}</p> 
+                                </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+            <div class="input-group input-group-sm chatMessageControls">
+                <form action="" method="POST" class="form-control">
+                    {% csrf_token %}
+                    {{ form.content|add_class:"add-comment comment" }}
+                    <input type="submit" class="btn btn-primary" value="Commit">
+                </form>
+            </div>
+    </article>
+    {% endif %}
+
+
 {% endblock content %}
