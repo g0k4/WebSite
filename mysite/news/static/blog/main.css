@@ -83,10 +83,10 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .news-img {
-    height: 400px;
-    width: 400px;
-    margin-right: 20px;
+    margin-right: auto;
+    display: block;
     margin-bottom: 16px;
+    margin-left: auto;
   }
 
   .account-heading {

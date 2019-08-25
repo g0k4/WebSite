@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from .models import News, Comment
 from .forms import CreateComment
 from django.urls import reverse
+from django.contrib import messages
 from django.db.models import Q
 from profiles.models import User
 from django.views.generic import (
@@ -14,8 +15,21 @@ from django.views.generic import (
 )
 
 
-def about_view(request):
-    return render(request,'news/about.html', {'title':'About'})
+def ping_view(request):
+    if request.user.is_superuser:
+        import subprocess
+        if request.method == 'POST':
+            host = request.POST['host']
+            command = ['ping', '-c','1',host]
+            # with output in infor
+            # info = subprocess.Popen(command, stdout=subprocess.PIPE).stdout.read().decode('utf-8')
+            code = subprocess.run(command, stdout=subprocess.PIPE).returncode
+            if not code:
+                messages.success(request, host+f' is up')
+            else:
+                messages.error(request, host+f' is down')
+
+    return redirect('news:home')
 
 
 def home_view(requset):
@@ -61,12 +75,6 @@ def search_view(request):
         'users':users,
     })
 
-
-"""
-def ping_view(request):
-    host = request.GET.get('ping','')
-    if ping_query:
-"""
 
 
 class NewsListView(ListView):
