@@ -1,14 +1,40 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <fieldset class="form-group">
-        <legend class="border-bottom mb-4">Profile Info</legend>
-        {{ form }}
-    </fieldset>
-    <div class="form-group">
-        <button class="btn btn-outline-info" type="submit">Update</button>
+
+<div class="row">
+    <div class="col-md-8">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Change Profile Info</legend>
+                {{ form.username|as_crispy_field }}
+                {{ form.image|as_crispy_field }}
+                {{ form.email|as_crispy_field }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        </form>
+        <form method="POST" enctype="multipart/form-data" action="password">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Change Password</legend>
+                {{ form_p|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        </form>
     </div>
-</form>
+    
+    <div class="col-md-4">
+        <legend class="border-bottom mb-4">Profile Info</legend>
+        <p>Your username: {{user.username}}</p>
+        <p>Your email: {{user.email}}</p>
+        <p>Your profile image: </p>
+        <img src="{{user.image.url}}" class="account-img">
+
+    </div>
+</div>
 {% endblock content %}
